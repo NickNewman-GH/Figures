@@ -1,19 +1,33 @@
 // сочетание определения класса и конструктора одновременно объявляет переменные и задаёт их значения
-class Rect(var x: Int, var y: Int, val width: Int, val height: Int) : Movable, Figure(0) {
-    // TODO: реализовать интерфейс Transforming
-    var color: Int = -1 // при объявлении каждое поле нужно инициализировать
+class Rect(var x: Int, var y: Int, var width: Int, var height: Int) : Figure(0) {
 
-    lateinit var name: String // значение на момент определения неизвестно (только для объектных типов)
-    // дополнительный конструктор вызывает основной
     constructor(rect: Rect) : this(rect.x, rect.y, rect.width, rect.height)
 
-    // нужно явно указывать, что вы переопределяете метод
+    override fun resize(zoom: Int) {
+        if (zoom > 0)
+            width *= zoom; height *= zoom
+        if (zoom < 0)
+            width /= -zoom; height /= -zoom
+    }
+
+    override fun rotate(direction: RotateDirection, centerX: Int, centerY: Int) {
+        x -= centerX
+        y -= centerY
+        x = y.also { y = x }
+        when (direction){
+            RotateDirection.Clockwise -> y = -y
+            RotateDirection.CounterClockwise -> x = -x
+        }
+        x += centerX
+        y += centerY
+        height = width.also { width = height }
+    }
+
     override fun move(dx: Int, dy: Int) {
         x += dx; y += dy
     }
 
-    // для каждого класса area() определяется по-своему
     override fun area(): Float {
-        return (width*height).toFloat() // требуется явное приведение к вещественному числу
+        return (width*height).toFloat()
     }
 }
